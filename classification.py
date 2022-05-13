@@ -1,6 +1,7 @@
 import numpy
 import math
-
+import pandas
+import random
 
 # These are suggested helper functions
 # You can structure your code differently, but if you have
@@ -52,24 +53,38 @@ def same(values):
     # if there are values:
     # pick the first, check if all other are the same 
 
+    firstValue = values[0]
+    for value in values:
+        if value != firstValue: return False
+    return True
+    
+
 
     
 # Determine how often each value shows up 
 # in a list; this is useful for the entropy
 # but also to determine which values is the 
 # most common
-def counts(values):
+def getCounts(values):
 
+    #declare an empty dict called frequencies
+    counts = {}
+    for value in values:
+        if value in counts:
+            counts[value] = counts[value] + 1
+        else:
+            counts[value] = 1
     # placeholder return value 
-    return {}
+    return counts
    
 
 # Return the most common value from a list 
 # Useful for base cases 1 and 3 above.
 def majority(values):
-
-    # placeholder return value
-    return 0
+    
+    counts = getCounts(values)
+    
+    return max(counts, key = counts.get)
     
     
 # Calculate the entropy of a set of values 
@@ -124,3 +139,22 @@ class DecisionTree:
         # change this if you store the tree in a different format
         return self.tree
        
+
+def main():
+    random.seed(3110)
+    randomList = []
+    for i in range(0,50):
+        n = random.randint(1,10)
+        randomList.append(n)
+
+    print(randomList)
+    print(getCounts(randomList))
+    print(majority(randomList))
+
+    
+
+
+
+
+if __name__ == '__main__':
+    main()
