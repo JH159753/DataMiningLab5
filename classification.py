@@ -83,7 +83,7 @@ def getCounts(values):
 def majority(values):
     
     counts = getCounts(values)
-    
+    #this is weird but max can apparently take a function and use that to calculate which one is maximum
     return max(counts, key = counts.get)
     
     
@@ -93,10 +93,23 @@ def majority(values):
 # of elements, you get the probability for that element 
 # The entropy is the negation of the sum of p*log2(p) 
 # for all these probabilities.
-def entropy(values):
+def getEntropy(values):
 
-    # placeholder return value
-    return 0
+    #make variable "counts" that stores dict how many times each value shows up
+    counts = getCounts(values)
+    entropy = 0
+
+    #for each item in the dict, set its count to itself, divided by the # of elements
+    #then use that to calculate entropy
+    for count in counts:
+        counts[count] = counts[count] / len(values)
+        
+        entropy = entropy + counts[count] * math.log2(counts[count] )
+
+    entropy = entropy * -1
+
+    return entropy    
+
 
 # This is the main decision tree class 
 # DO NOT CHANGE THE FOLLOWING LINE
@@ -149,7 +162,7 @@ def main():
 
     print(randomList)
     print(getCounts(randomList))
-    print(majority(randomList))
+    print(getEntropy(randomList))
 
     
 
