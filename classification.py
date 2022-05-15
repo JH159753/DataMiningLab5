@@ -12,28 +12,62 @@ def make_node(previous_ys, xs, ys, columns):
     # WARNING: lists are passed by reference in python
     # If you are planning to remove items, it's better 
     # to create a copy first
+
+    #so basically this makes a copy of columns and saves it into local variable columns
+    #so now any changes we make to columns won't change the thing that got passed in
     columns = columns[:]
+
+    node = {}
 
     # First, check the three termination criteria:
     
     # If there are no rows (xs and ys are empty): 
     #      Return a node that classifies as the majority class of the parent
-    
+
+    #only checking if one is empty because if either one is empty, the other will be too
+    if len(ys) == 0:
+        node["type"] = "class"
+        node["class"] = majority(previous_ys)
+        return node
+
     # If all ys are the same:
     #      Return a node that classifies as that class 
+    if (same(ys)):
+        node["type"] = "class"
+        node["class"] = ys[0]
     
     # If there are no more columns left:
     #      Return a node that classifies as the majority class of the ys
 
+    if (len(columns) == 0):
+        node["type"] = "class"
+        node["class"] = majority(ys)
 
     # Otherwise:
     # Compute the entropy of the current ys 
+
+    currentEntropy = getEntropy(ys)
+    bestColumn = None
+    bestEntropy = math.inf
+
     # For each column:
     #     Perform a split on the values in that column 
     #     Calculate the entropy of each of the pieces
     #     Compute the overall entropy as the weighted sum 
     #     The gain of the column is the difference of the entropy before
     #        the split, and this new overall entropy 
+
+    for col in columns:
+        #list comprehension + convert to set and then to list to remove dupes
+        #the list comprehension sets values to every value that we care about in a specific column
+        values = list(set(x[col] for x in xs))
+        sumEntropy = 0
+        for value in values:
+            # use zip xs ys to make tuples out of xs and ys, then for each pair, check if x[col] is value and if it is, save it into y
+            subys = [y for (x, y) in zip(xs, ys) if x[col] == value]
+                
+        
+
     # Select the column with the highest gain, then:
     # Split the data along the column values and recursively call 
     #    make_node for each piece 
