@@ -35,6 +35,7 @@ def make_node(previous_ys, xs, ys, columns):
     if (same(ys)):
         node["type"] = "class"
         node["class"] = ys[0]
+        return node
     
     # If there are no more columns left:
     #      Return a node that classifies as the majority class of the ys
@@ -42,6 +43,7 @@ def make_node(previous_ys, xs, ys, columns):
     if (len(columns) == 0):
         node["type"] = "class"
         node["class"] = majority(ys)
+        return node
 
     # Otherwise:
     # Compute the entropy of the current ys 
@@ -65,17 +67,36 @@ def make_node(previous_ys, xs, ys, columns):
         for value in values:
             # use zip xs ys to make tuples out of xs and ys, then for each pair, check if x[col] is value and if it is, save it into y
             subys = [y for (x, y) in zip(xs, ys) if x[col] == value]
-                
-        
+            sumEntropy += len(subys) / len(ys) * getEntropy(subys)
 
+        if sumEntropy < bestEntropy: 
+            bestColumn = col
+        
     # Select the column with the highest gain, then:
     # Split the data along the column values and recursively call 
     #    make_node for each piece 
     # Create a split-node that splits on this column, and has the result 
     #    of the recursive calls as children.
+
+    values = list(set(x[bestColumn] for x in xs))
+    node["type"] = "split"
+    node["children"] = {}
+
+
+
+    columns.remove(bestColumn)
+
+    for value in values:
+        subxs = [x for (x, y) in zip(xs, ys) if x[col] == value]
+        subys = [y for (x, y) in zip(xs, ys) if x[col] == value]
+        
+        node["children"][value] = make_node(ys, subxs, subys, columns)
+
+        #print(value)
+
+    return node
+
     
-    # Note: This is a placeholder return value
-    return {"type": "class", "class": majority(ys)}
 
     
     
@@ -167,6 +188,9 @@ class DecisionTree:
 
         # To classify using the tree:
         # Start with the root as the "current" node
+
+
+
         # As long as the current node is an interior node (type == "split"):
         #    get the value of the attribute the split is performed on 
         #    select the child corresponding to that value as the new current node 
@@ -187,6 +211,11 @@ class DecisionTree:
         return self.tree
        
 
+def get_columns(rows, columns, single=False):
+    if single:
+        return [row[columns[0]] for row in rows]
+    return [[row[c] for c in columns] for row in rows]
+
 def main():
     random.seed(3110)
     randomList = []
@@ -194,9 +223,33 @@ def main():
         n = random.randint(1,10)
         randomList.append(n)
 
-    print(randomList)
-    print(getCounts(randomList))
-    print(getEntropy(randomList))
+    #print(randomList)
+    #print(getCounts(randomList))
+    #print(getEntropy(randomList))
+
+    df = pandas.read_csv("testdata.csv")
+    training = []
+    validation = []
+    for i,row in df.iterrows():
+        if random.random() > 0.85:
+            validation.append(row)
+        else:
+            training.append(row)
+
+    columns = ["cat1", "cat2"]
+    target = ["cls3"]
+
+    tx = get_columns(training, columns)
+    ty = get_columns(training, target, single=True)
+
+    tree = DecisionTree()
+
+    tree.fit(tx, ty)
+
+    print()
+    print(tree.to_dict())
+
+
 
     
 
