@@ -80,6 +80,7 @@ def make_node(previous_ys, xs, ys, columns):
 
     values = list(set(x[bestColumn] for x in xs))
     node["type"] = "split"
+    node["split"] = bestColumn
     node["children"] = {}
 
 
@@ -189,20 +190,41 @@ class DecisionTree:
         # To classify using the tree:
         # Start with the root as the "current" node
 
-
+        
 
         # As long as the current node is an interior node (type == "split"):
         #    get the value of the attribute the split is performed on 
         #    select the child corresponding to that value as the new current node 
+
+        resultList = []
+        for row in x:
+            current = self.tree
+
+            #print("this is row")
+            #print(row)
+            while (current != None and current["type"] == "split"):
+
+                key = row[current["split"]]
+
+                #print("this is current before picking")
+                #print(current)
+                current = current["children"][key]
+
+            #print("this is current after loop")
+            #print(current)
+                
+            if current == None:
+                resultList.append(self.majority)
+            else: 
+                resultList.append(current["class"])
+
         
         # NOTE: In some cases, your tree may not have a child for a particular value 
         #       In that case, return the majority value (self.majority) from the training set 
         
         # IMPORTANT: You have to perform this classification *for each* element in x 
-        
-        # placeholder return value
         # Note that the result is a list of predictions, one for each x-value
-        return [self.majority for _ in x]
+        return resultList
     
     # DO NOT CHANGE THE FOLLOWING LINE
     def to_dict(self):
